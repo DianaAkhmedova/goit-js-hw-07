@@ -6,7 +6,6 @@ console.log(galleryItems);
 const refs = {
   list: document.querySelector(".gallery"),
 };
-console.log(refs.list);
 
 const markup = galleryItems
   .map(
@@ -24,4 +23,23 @@ const markup = galleryItems
   .join("");
 
 refs.list.innerHTML = markup;
-console.log(refs.list);
+
+const onGalleryClick = (event) => {
+  event.preventDefault();
+  if (event.target === event.currentTarget) return;
+
+  const originalImage = event.target.dataset.source;
+
+  const instance = basicLightbox.create(`
+  <img src="${originalImage}">
+`);
+  instance.show();
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key && event.code !== "Escape") return;
+
+    instance.close();
+  });
+};
+
+refs.list.addEventListener("click", onGalleryClick);
