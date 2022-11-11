@@ -4,7 +4,7 @@ import { galleryItems } from "./gallery-items.js";
 console.log(galleryItems);
 
 const refs = {
-  list: document.querySelector(".gallery"),
+  gallery: document.querySelector(".gallery"),
 };
 
 const markup = galleryItems
@@ -22,24 +22,37 @@ const markup = galleryItems
   )
   .join("");
 
-refs.list.innerHTML = markup;
+refs.gallery.innerHTML = markup;
+
+const instance = basicLightbox.create(
+  `
+<img src="" width="800" height="600">
+`,
+  {
+    onShow: (instance) => {
+      document.addEventListener("keydown", closeModal);
+    },
+    onClose: (instance) => {
+      document.removeEventListener("keydown", closeModal);
+    },
+  }
+);
+
+const img = instance.element().querySelector("img");
 
 const onGalleryClick = (event) => {
   event.preventDefault();
   if (event.target === event.currentTarget) return;
 
-  const originalImage = event.target.dataset.source;
+  img.src = event.target.dataset.source;
 
-  const instance = basicLightbox.create(`
-  <img src="${originalImage}">
-`);
   instance.show();
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key && event.code !== "Escape") return;
-
-    instance.close();
-  });
 };
 
-refs.list.addEventListener("click", onGalleryClick);
+const closeModal = (event) => {
+  if (event.key !== "Escape") return;
+
+  instance.close();
+};
+
+refs.gallery.addEventListener("click", onGalleryClick);
